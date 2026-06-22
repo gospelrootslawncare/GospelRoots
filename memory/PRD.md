@@ -41,3 +41,10 @@ Modern, professional, responsive website for Gospel Roots Lawn Care. Tagline: "S
 - P2: Google reviews integration
 - P2: Booking/scheduling integration
 
+
+## Iteration 2 (2026-06-22)
+- Replaced contact placeholders with real info: (903) 424-5931, gospelrootslawncare@gmail.com, Gilmer, TX. Removed social media icons.
+- Admin auth (Bearer JWT in localStorage, bcrypt hashed password, brute-force lockout, 12h access token).
+- Admin inbox page at /admin (auth-protected) and /admin/login. Lists/views/deletes quote requests.
+- Resend email notification on every new quote (non-blocking via asyncio.to_thread). Sender: onboarding@resend.dev (Resend test sender). Recipient: gospelrootslawncare@gmail.com.
+- Testing agent iteration_2: 13/13 backend, 21/21 frontend — all green.
