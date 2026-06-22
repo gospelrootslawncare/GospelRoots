@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { LogOut, Mail, Phone, MapPin, Trash2, RefreshCw, Inbox, Calendar } from "lucide-react";
 import { useAuth, formatApiErrorDetail } from "../context/AuthContext";
-import Logo from "../components/Logo";
+import BrandMark from "../components/BrandMark";
 import { toast } from "sonner";
 
 function formatDate(iso) {
@@ -79,7 +79,7 @@ export default function AdminQuotes() {
       <header className="bg-white border-b border-black/5">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 text-brand-primary" data-testid="admin-home-link">
-            <Logo size={28} />
+            <BrandMark size={32} variant="dark" />
             <div className="leading-tight">
               <div className="font-serif text-lg font-semibold">Gospel Roots</div>
               <div className="text-[10px] uppercase tracking-[0.22em] text-brand-accent font-semibold">Admin</div>

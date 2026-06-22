@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { Lock, Mail, ArrowRight } from "lucide-react";
 import { useAuth, formatApiErrorDetail } from "../context/AuthContext";
-import Logo from "../components/Logo";
+import BrandMark from "../components/BrandMark";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 
@@ -34,7 +34,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex items-center justify-center bg-brand-base px-5">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-3 text-brand-primary mb-8" data-testid="login-home-link">
-          <Logo size={40} />
+          <BrandMark size={48} variant="dark" />
           <div className="leading-tight">
             <div className="font-serif text-2xl font-semibold">Gospel Roots</div>
             <div className="text-[10px] uppercase tracking-[0.22em] text-brand-accent font-semibold">Lawn Care</div>

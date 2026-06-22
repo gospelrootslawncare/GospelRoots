@@ -1,6 +1,6 @@
 import React from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
-import Logo from "./Logo";
+import BrandMark from "./BrandMark";
 
 const LINKS = [
   { href: "/#home", label: "Home" },
@@ -20,7 +20,7 @@ export default function Footer() {
         <div className="grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-5">
             <div className="flex items-center gap-3 text-white">
-              <Logo size={40} />
+              <BrandMark size={48} variant="light" />
               <div className="leading-tight">
                 <div className="font-serif text-2xl font-semibold">Gospel Roots Lawn Care</div>
                 <div className="text-[11px] uppercase tracking-[0.22em] text-[#cbe2d0]">

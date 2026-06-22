@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import Logo from "./Logo";
+import BrandMark from "./BrandMark";
 
 const NAV = [
   { href: "#home", label: "Home" },
@@ -29,7 +29,7 @@ export default function Navbar() {
           data-testid="nav-logo"
           className="flex items-center gap-3 text-brand-primary hover:opacity-90 transition"
         >
-          <Logo size={34} />
+          <BrandMark size={42} variant="dark" />
           <div className="leading-tight">
             <div className="font-serif text-lg sm:text-xl text-brand-primary font-semibold tracking-tight">
               Gospel Roots
