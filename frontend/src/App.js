@@ -1,5 +1,6 @@
 import React from "react";
 import "@/App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 
 import Navbar from "@/components/Navbar";
@@ -13,12 +14,14 @@ import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import useScrollReveal from "@/hooks/useScrollReveal";
+import { AuthProvider } from "@/context/AuthContext";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminQuotes from "@/pages/AdminQuotes";
 
-function App() {
+function HomePage() {
   useScrollReveal();
-
   return (
-    <div className="App" data-testid="app-root">
+    <div data-testid="app-root">
       <Navbar />
       <main>
         <Hero />
@@ -31,12 +34,26 @@ function App() {
         <Contact />
       </main>
       <Footer />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div className="App">
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin" element={<AdminQuotes />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
       <Toaster
         position="top-right"
         richColors
-        toastOptions={{
-          style: { fontFamily: "Manrope, sans-serif" },
-        }}
+        toastOptions={{ style: { fontFamily: "Manrope, sans-serif" } }}
       />
     </div>
   );

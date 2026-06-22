@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Mail, Phone, MapPin, Send, Facebook, Instagram, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
@@ -60,7 +60,7 @@ export default function Contact() {
 
             <div className="mt-10 space-y-5">
               <a
-                href="tel:+15551234567"
+                href="tel:+19034245931"
                 data-testid="contact-phone-link"
                 className="group flex items-center gap-4 rounded-2xl bg-white border border-black/5 p-4 hover:shadow-md transition"
               >
@@ -69,12 +69,12 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-[#4A5568]">Phone</div>
-                  <div className="font-serif text-xl text-brand-primary">(555) 123-4567</div>
+                  <div className="font-serif text-xl text-brand-primary">(903) 424-5931</div>
                 </div>
               </a>
 
               <a
-                href="mailto:hello@gospelrootslawncare.com"
+                href="mailto:gospelrootslawncare@gmail.com"
                 data-testid="contact-email-link"
                 className="group flex items-center gap-4 rounded-2xl bg-white border border-black/5 p-4 hover:shadow-md transition"
               >
@@ -83,7 +83,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-[#4A5568]">Email</div>
-                  <div className="font-serif text-xl text-brand-primary">hello@gospelrootslawncare.com</div>
+                  <div className="font-serif text-xl text-brand-primary break-all">gospelrootslawncare@gmail.com</div>
                 </div>
               </a>
 
@@ -93,27 +93,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-[#4A5568]">Service Area</div>
-                  <div className="font-serif text-xl text-brand-primary">Locally Owned & Operated</div>
+                  <div className="font-serif text-xl text-brand-primary">Gilmer, TX &amp; surrounding areas</div>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <a
-                  href="#"
-                  data-testid="social-facebook"
-                  aria-label="Facebook"
-                  className="w-10 h-10 rounded-full bg-brand-primary text-white flex items-center justify-center hover:bg-brand-secondary transition"
-                >
-                  <Facebook size={16} />
-                </a>
-                <a
-                  href="#"
-                  data-testid="social-instagram"
-                  aria-label="Instagram"
-                  className="w-10 h-10 rounded-full bg-brand-primary text-white flex items-center justify-center hover:bg-brand-secondary transition"
-                >
-                  <Instagram size={16} />
-                </a>
               </div>
             </div>
           </div>

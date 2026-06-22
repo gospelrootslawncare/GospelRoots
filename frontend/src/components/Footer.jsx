@@ -1,16 +1,16 @@
 import React from "react";
-import { Facebook, Instagram, Mail, Phone } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 import Logo from "./Logo";
 
 const LINKS = [
-  { href: "#home", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#services", label: "Services" },
-  { href: "#why", label: "Why Us" },
-  { href: "#gallery", label: "Gallery" },
-  { href: "#testimonials", label: "Reviews" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#home", label: "Home" },
+  { href: "/#about", label: "About" },
+  { href: "/#services", label: "Services" },
+  { href: "/#why", label: "Why Us" },
+  { href: "/#gallery", label: "Gallery" },
+  { href: "/#testimonials", label: "Reviews" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Footer() {
@@ -29,18 +29,9 @@ export default function Footer() {
               </div>
             </div>
             <p className="mt-6 text-white/75 max-w-md leading-relaxed">
-              Family-run lawn care service founded by Lucas & Matthew. Honest work, dependable service, and yards
+              Family-run lawn care service founded by Lucas &amp; Matthew. Honest work, dependable service, and yards
               we’re proud to stand behind.
             </p>
-
-            <div className="mt-6 flex items-center gap-3">
-              <a href="#" data-testid="footer-social-facebook" aria-label="Facebook" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
-                <Facebook size={16} />
-              </a>
-              <a href="#" data-testid="footer-social-instagram" aria-label="Instagram" className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center">
-                <Instagram size={16} />
-              </a>
-            </div>
           </div>
 
           <div className="lg:col-span-4">
@@ -64,18 +55,23 @@ export default function Footer() {
             <div className="text-xs uppercase tracking-[0.22em] text-[#cbe2d0] font-semibold">Contact</div>
             <ul className="mt-5 space-y-3 text-sm">
               <li>
-                <a href="tel:+15551234567" className="inline-flex items-center gap-2 text-white/90 hover:text-white transition">
-                  <Phone size={14} /> (555) 123-4567
+                <a href="tel:+19034245931" className="inline-flex items-center gap-2 text-white/90 hover:text-white transition">
+                  <Phone size={14} /> (903) 424-5931
                 </a>
               </li>
               <li>
-                <a href="mailto:hello@gospelrootslawncare.com" className="inline-flex items-center gap-2 text-white/90 hover:text-white transition break-all">
-                  <Mail size={14} /> hello@gospelrootslawncare.com
+                <a href="mailto:gospelrootslawncare@gmail.com" className="inline-flex items-center gap-2 text-white/90 hover:text-white transition break-all">
+                  <Mail size={14} /> gospelrootslawncare@gmail.com
                 </a>
+              </li>
+              <li>
+                <span className="inline-flex items-center gap-2 text-white/90">
+                  <MapPin size={14} /> Gilmer, TX
+                </span>
               </li>
             </ul>
             <a
-              href="#contact"
+              href="/#contact"
               data-testid="footer-cta-quote"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-white text-brand-primary px-5 py-2.5 text-sm font-semibold hover:bg-[#F9F8F6] transition"
             >
