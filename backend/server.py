@@ -155,7 +155,12 @@ class QuoteRequest(BaseModel):
     address: Optional[str] = None
     service: Optional[str] = None
     message: str
+    status: str = "new"  # new | contacted | quoted | won | lost
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class QuoteStatusUpdate(BaseModel):
+    status: str = Field(..., pattern="^(new|contacted|quoted|won|lost)$")
 
 
 class LoginPayload(BaseModel):
@@ -290,6 +295,24 @@ async def delete_quote(quote_id: str, _: dict = Depends(require_admin)):
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Quote not found")
     return {"deleted": quote_id}
+
+
+@api_router.patch("/quotes/{quote_id}", response_model=QuoteRequest)
+async def update_quote_status(
+    quote_id: str,
+    payload: QuoteStatusUpdate,
+    _: dict = Depends(require_admin),
+):
+    res = await db.quote_requests.update_one(
+        {"id": quote_id}, {"$set": {"status": payload.status}}
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Quote not found")
+    doc = await db.quote_requests.find_one({"id": quote_id}, {"_id": 0})
+    if isinstance(doc.get("created_at"), str):
+        doc["created_at"] = datetime.fromisoformat(doc["created_at"])
+    doc.setdefault("status", "new")
+    return doc
 
 
 # ----- Auth routes -----

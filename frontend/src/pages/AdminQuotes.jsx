@@ -1,9 +1,33 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Navigate, Link } from "react-router-dom";
-import { LogOut, Mail, Phone, MapPin, Trash2, RefreshCw, Inbox, Calendar } from "lucide-react";
+import {
+  LogOut, Mail, Phone, MapPin, Trash2, RefreshCw, Inbox, Calendar, ChevronDown,
+} from "lucide-react";
 import { useAuth, formatApiErrorDetail } from "../context/AuthContext";
 import BrandMark from "../components/BrandMark";
 import { toast } from "sonner";
+
+const STATUSES = [
+  { key: "new",       label: "New",       cls: "bg-[#EAF1EC] text-brand-primary border-brand-primary/20" },
+  { key: "contacted", label: "Contacted", cls: "bg-[#FFF6E2] text-[#8a6d1a] border-[#e6cd7f]" },
+  { key: "quoted",    label: "Quoted",    cls: "bg-[#E6EEF7] text-[#1e3a5f] border-[#a8c0dd]" },
+  { key: "won",       label: "Won",       cls: "bg-[#E7F4E7] text-[#1f5e1f] border-[#a8d5a8]" },
+  { key: "lost",      label: "Lost",      cls: "bg-[#F5E6E6] text-[#7a2424] border-[#dca7a7]" },
+];
+
+const STATUS_BY_KEY = STATUSES.reduce((m, s) => ((m[s.key] = s), m), {});
+
+function StatusBadge({ status }) {
+  const s = STATUS_BY_KEY[status] || STATUS_BY_KEY.new;
+  return (
+    <span
+      data-testid={`status-badge-${status}`}
+      className={`inline-flex items-center text-[10px] uppercase tracking-[0.16em] font-semibold rounded-full border px-2.5 py-1 ${s.cls}`}
+    >
+      {s.label}
+    </span>
+  );
+}
 
 function formatDate(iso) {
   try {
@@ -23,15 +47,24 @@ export default function AdminQuotes() {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [filter, setFilter] = useState("all");
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (preserveSelectedId) => {
     setRefreshing(true);
     setError("");
     try {
       const { data } = await api.get("/quotes");
       setQuotes(data);
-      if (data.length > 0 && !selected) setSelected(data[0]);
+      if (preserveSelectedId) {
+        const found = data.find((q) => q.id === preserveSelectedId);
+        if (found) setSelected(found);
+        else if (data.length > 0) setSelected(data[0]);
+        else setSelected(null);
+      } else if (data.length > 0 && !selected) {
+        setSelected(data[0]);
+      }
     } catch (err) {
       setError(formatApiErrorDetail(err?.response?.data?.detail) || "Could not load quotes.");
     } finally {
@@ -43,6 +76,22 @@ export default function AdminQuotes() {
     if (user && user.role === "admin") load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  const counts = useMemo(() => {
+    const c = { all: 0, new: 0, contacted: 0, quoted: 0, won: 0, lost: 0 };
+    (quotes || []).forEach((q) => {
+      c.all += 1;
+      const s = q.status || "new";
+      if (c[s] !== undefined) c[s] += 1;
+    });
+    return c;
+  }, [quotes]);
+
+  const visible = useMemo(() => {
+    if (!quotes) return [];
+    if (filter === "all") return quotes;
+    return quotes.filter((q) => (q.status || "new") === filter);
+  }, [quotes, filter]);
 
   if (user === null) {
     return (
@@ -71,7 +120,20 @@ export default function AdminQuotes() {
     }
   };
 
-  const count = quotes?.length ?? 0;
+  const handleStatusChange = async (id, newStatus) => {
+    setUpdatingId(id);
+    try {
+      const { data } = await api.patch(`/quotes/${id}`, { status: newStatus });
+      const updated = quotes.map((q) => (q.id === id ? data : q));
+      setQuotes(updated);
+      if (selected?.id === id) setSelected(data);
+      toast.success(`Marked as ${STATUS_BY_KEY[newStatus].label}.`);
+    } catch (err) {
+      toast.error(formatApiErrorDetail(err?.response?.data?.detail) || "Update failed.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-brand-base flex flex-col">
@@ -104,11 +166,11 @@ export default function AdminQuotes() {
             <div className="text-xs uppercase tracking-[0.22em] text-brand-accent font-semibold">Inbox</div>
             <h1 className="font-serif text-4xl text-brand-primary mt-2 tracking-tight">Quote Requests</h1>
             <p className="text-sm text-[#4A5568] mt-1" data-testid="admin-count">
-              {count === 0 ? "No requests yet." : `${count} ${count === 1 ? "request" : "requests"} total`}
+              {counts.all === 0 ? "No requests yet." : `${counts.all} total · ${counts.new} new · ${counts.won} won`}
             </p>
           </div>
           <button
-            onClick={load}
+            onClick={() => load(selected?.id)}
             disabled={refreshing}
             data-testid="admin-refresh"
             className="inline-flex items-center gap-2 rounded-full bg-brand-primary text-white px-4 py-2 text-sm font-semibold hover:bg-brand-secondary transition disabled:opacity-60"
@@ -116,6 +178,35 @@ export default function AdminQuotes() {
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} /> Refresh
           </button>
         </div>
+
+        {/* Filter chips */}
+        {quotes && quotes.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2" data-testid="admin-filters">
+            {[
+              { key: "all", label: "All" },
+              ...STATUSES,
+            ].map((s) => {
+              const active = filter === s.key;
+              return (
+                <button
+                  key={s.key}
+                  onClick={() => setFilter(s.key)}
+                  data-testid={`admin-filter-${s.key}`}
+                  className={`inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] font-semibold rounded-full px-4 py-2 border transition ${
+                    active
+                      ? "bg-brand-primary text-white border-brand-primary"
+                      : "bg-white text-[#1B4332] border-black/10 hover:border-brand-primary/30"
+                  }`}
+                >
+                  {s.label}
+                  <span className={`text-[10px] font-bold ${active ? "text-white/80" : "text-[#4A5568]"}`}>
+                    {counts[s.key] ?? 0}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {error && (
           <div className="mt-6 rounded-xl bg-red-50 border border-red-100 text-red-700 px-4 py-3 text-sm" data-testid="admin-error">
@@ -135,8 +226,14 @@ export default function AdminQuotes() {
           <div className="mt-8 grid lg:grid-cols-12 gap-6">
             {/* List */}
             <ul className="lg:col-span-5 space-y-3" data-testid="admin-quote-list">
-              {quotes.map((q) => {
+              {visible.length === 0 && (
+                <li className="rounded-2xl bg-white border border-dashed border-black/10 p-6 text-sm text-[#4A5568] text-center">
+                  No quotes in this filter.
+                </li>
+              )}
+              {visible.map((q) => {
                 const active = selected?.id === q.id;
+                const status = q.status || "new";
                 return (
                   <li key={q.id}>
                     <button
@@ -151,7 +248,10 @@ export default function AdminQuotes() {
                           {formatDate(q.created_at)}
                         </div>
                       </div>
-                      <div className="mt-1 text-sm text-[#4A5568] truncate">{q.service || "No service specified"}</div>
+                      <div className="mt-1 flex items-center gap-2 text-sm text-[#4A5568] truncate">
+                        <StatusBadge status={status} />
+                        <span className="truncate">{q.service || "No service specified"}</span>
+                      </div>
                       <div className="mt-2 text-sm text-[#3a4452] line-clamp-2">{q.message}</div>
                     </button>
                   </li>
@@ -179,6 +279,26 @@ export default function AdminQuotes() {
                     >
                       <Trash2 size={14} /> {deletingId === selected.id ? "Deleting…" : "Delete"}
                     </button>
+                  </div>
+
+                  {/* Status control */}
+                  <div className="mt-5 flex flex-wrap items-center gap-3" data-testid="admin-status-control">
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#4A5568] font-semibold">Lead status</span>
+                    <div className="relative">
+                      <select
+                        value={selected.status || "new"}
+                        onChange={(e) => handleStatusChange(selected.id, e.target.value)}
+                        disabled={updatingId === selected.id}
+                        data-testid="admin-status-select"
+                        className="appearance-none bg-white border border-black/10 rounded-full pl-4 pr-9 py-1.5 text-sm font-semibold text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/25 disabled:opacity-60"
+                      >
+                        {STATUSES.map((s) => (
+                          <option key={s.key} value={s.key}>{s.label}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4A5568] pointer-events-none" />
+                    </div>
+                    <StatusBadge status={selected.status || "new"} />
                   </div>
 
                   <div className="mt-6 grid sm:grid-cols-2 gap-3">

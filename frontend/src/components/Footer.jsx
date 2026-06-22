@@ -7,10 +7,10 @@ const LINKS = [
   { href: "/#about", label: "About" },
   { href: "/#services", label: "Services" },
   { href: "/#why", label: "Why Us" },
+  { href: "/#areas", label: "Areas" },
   { href: "/#gallery", label: "Gallery" },
-  { href: "/#testimonials", label: "Reviews" },
+  { href: "/blog", label: "Blog" },
   { href: "/#faq", label: "FAQ" },
-  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Footer() {

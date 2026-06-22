@@ -169,6 +169,73 @@ def test_delete_quote_requires_auth():
     assert r.status_code == 401
 
 
+# ===== Quotes: Status field default + PATCH (iteration 3) =====
+def test_list_quotes_includes_status_default_new(session, admin_session):
+    # Create a fresh quote
+    r = session.post(f"{API}/quotes", json={
+        "name": "TEST_StatusDefault", "email": "test_status@example.com",
+        "phone": "555-7777", "message": "default status",
+    })
+    assert r.status_code == 201, r.text
+    qid = r.json()["id"]
+    assert r.json().get("status") == "new"
+    _created_quote_ids.append(qid)
+
+    # Listing also returns status field
+    r2 = admin_session.get(f"{API}/quotes")
+    assert r2.status_code == 200
+    found = next((q for q in r2.json() if q["id"] == qid), None)
+    assert found is not None
+    assert found.get("status") == "new"
+
+
+def test_patch_quote_status_requires_auth():
+    r = requests.patch(f"{API}/quotes/anything", json={"status": "won"})
+    assert r.status_code == 401
+
+
+def test_patch_quote_status_valid_transitions(session, admin_session):
+    # Create test quote
+    r = session.post(f"{API}/quotes", json={
+        "name": "TEST_PatchValid", "email": "test_patch@example.com",
+        "phone": "555-8888", "message": "patch me",
+    })
+    assert r.status_code == 201
+    qid = r.json()["id"]
+    _created_quote_ids.append(qid)
+
+    for new_status in ["contacted", "quoted", "won", "lost", "new"]:
+        rp = admin_session.patch(f"{API}/quotes/{qid}", json={"status": new_status})
+        assert rp.status_code == 200, rp.text
+        body = rp.json()
+        assert body["id"] == qid
+        assert body["status"] == new_status
+        assert "_id" not in body
+        # Confirm persistence via GET
+        rg = admin_session.get(f"{API}/quotes")
+        assert rg.status_code == 200
+        persisted = next((q for q in rg.json() if q["id"] == qid), None)
+        assert persisted and persisted["status"] == new_status
+
+
+def test_patch_quote_status_invalid_value(session, admin_session):
+    r = session.post(f"{API}/quotes", json={
+        "name": "TEST_PatchInvalid", "email": "test_invalid@example.com",
+        "phone": "555-1212", "message": "x",
+    })
+    assert r.status_code == 201
+    qid = r.json()["id"]
+    _created_quote_ids.append(qid)
+
+    rp = admin_session.patch(f"{API}/quotes/{qid}", json={"status": "invalid"})
+    assert rp.status_code == 422
+
+
+def test_patch_quote_status_unknown_id(admin_session):
+    rp = admin_session.patch(f"{API}/quotes/does-not-exist", json={"status": "won"})
+    assert rp.status_code == 404
+
+
 def test_delete_quote_with_admin_and_cleanup(admin_session):
     # Delete every TEST_ quote we created
     assert _created_quote_ids, "No TEST_ quote ids captured for cleanup"

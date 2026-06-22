@@ -67,6 +67,18 @@ export default function Hero() {
             </a>
           </div>
 
+          {/* 24-hour promise */}
+          <div
+            className="reveal mt-5 inline-flex items-center gap-2 text-xs sm:text-sm text-white/85"
+            style={{ transitionDelay: "300ms" }}
+            data-testid="hero-promise"
+          >
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#cbe2d0]/20 text-[#cbe2d0]">
+              ✓
+            </span>
+            Free estimate within <strong className="font-semibold text-white">24 hours</strong> · Gilmer, TX &amp; surrounding areas
+          </div>
+
           {/* Trust badges */}
           <div
             className="reveal mt-12 grid grid-cols-3 max-w-lg gap-6 text-white/90"
