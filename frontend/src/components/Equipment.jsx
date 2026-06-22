@@ -4,7 +4,7 @@ import { Wrench, Truck, Fuel, Sparkles, Cog } from "lucide-react";
 const ITEMS = [
   { icon: Wrench,   title: "Commercial-grade mowers",        desc: "Sharp blades, balanced decks, kept maintained for clean, consistent cuts." },
   { icon: Cog,      title: "String trimmers & edgers",       desc: "Pro-level trimmers for tight corners and bed lines that read straight from the street." },
-  { icon: Truck,    title: "Trailer-ready setup",            desc: "Everything loaded and ready so we arrive on time and leave when the job is truly done." },
+  { icon: Truck,    title: "Truck-loaded & ready",           desc: "Everything we need fits in the truck — no trailer, no slow setup, no extra footprint on your property." },
   { icon: Fuel,     title: "Spare fuel & supplies",          desc: "We don’t have to leave your property to get the job done right." },
   { icon: Sparkles, title: "Blower for cleanup",             desc: "Driveways, walkways and porches blown clean before we leave — no clippings left behind." },
 ];

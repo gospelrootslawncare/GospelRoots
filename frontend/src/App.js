@@ -12,7 +12,6 @@ import AreasServed from "@/components/AreasServed";
 import MeetTheTeam from "@/components/MeetTheTeam";
 import Equipment from "@/components/Equipment";
 import Gallery from "@/components/Gallery";
-import Testimonials from "@/components/Testimonials";
 import GoogleReviews from "@/components/GoogleReviews";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
@@ -43,7 +42,6 @@ function HomePage() {
         <Equipment />
         <AreasServed />
         <Gallery />
-        <Testimonials />
         <GoogleReviews />
         <FAQ />
         <Contact />

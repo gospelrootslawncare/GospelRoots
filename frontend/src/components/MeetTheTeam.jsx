@@ -4,17 +4,17 @@ import { Cross, Heart } from "lucide-react";
 const FOUNDERS = [
   {
     initials: "L",
-    name: "Lucas",
-    role: "Co-Founder · Lead Caretaker",
+    name: "Lucas Robins",
+    role: "Co-Founder",
     bio:
-      "Grew up around East Texas yards and learned early that the small details — straight lines, clean edges, a tidy driveway after the job — are what make a lawn feel cared for. Focused on quality and consistency on every visit.",
+      "Lucas Robins is a co-founder of Gospel Roots Lawn Care. His faith in Jesus Christ shapes the way he approaches both life and business. Having traveled to South Korea, the Marshall Islands, and several states across the United States, he has developed an appreciation for serving people from many different backgrounds with kindness and respect.\n\nLucas is committed to providing dependable, high-quality lawn care with honesty, integrity, and attention to detail. He believes every job is an opportunity to serve others well and to honor God through excellence and hard work.",
   },
   {
     initials: "M",
     name: "Matthew",
-    role: "Co-Founder · Operations",
+    role: "Co-Founder",
     bio:
-      "Runs scheduling, customer communication, and equipment upkeep so jobs stay on time and well-prepared. Believes a friendly conversation and a clear quote should come standard with every estimate.",
+      "Matthew is a co-founder of Gospel Roots Lawn Care. Raised in East Texas, he grew up mowing lawns and developed a strong work ethic from an early age. His years of hands-on experience have taught him the importance of reliability, quality, and taking pride in every job.\n\nMatthew’s faith in Jesus Christ motivates him to serve customers with humility, honesty, and excellence. He is dedicated to treating every property as if it were his own and building lasting relationships through dependable service and genuine care for the community.",
   },
 ];
 
@@ -28,7 +28,7 @@ export default function MeetTheTeam() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         <div className="max-w-3xl reveal">
           <div className="text-xs uppercase tracking-[0.22em] text-brand-accent font-semibold inline-flex items-center gap-2">
-            <Heart size={14} /> Meet the team
+            <Heart size={14} /> Meet the Founders
           </div>
           <h2 className="font-serif text-4xl sm:text-5xl text-brand-primary mt-3 tracking-tight">
             Lucas &amp; Matthew.
@@ -43,7 +43,7 @@ export default function MeetTheTeam() {
           {FOUNDERS.map((f, i) => (
             <article
               key={f.name}
-              data-testid={`team-member-${f.name.toLowerCase()}`}
+              data-testid={`team-member-${f.name.split(' ')[0].toLowerCase()}`}
               className="reveal rounded-3xl bg-brand-base border border-black/[0.05] p-7 sm:p-9 flex items-start gap-6 shadow-sm"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
@@ -63,7 +63,7 @@ export default function MeetTheTeam() {
                 <div className="text-xs uppercase tracking-[0.18em] text-brand-accent font-semibold mt-1">
                   {f.role}
                 </div>
-                <p className="mt-4 text-[#3a4452] leading-relaxed text-sm">{f.bio}</p>
+                <p className="mt-4 text-[#3a4452] leading-relaxed text-sm whitespace-pre-line">{f.bio}</p>
               </div>
             </article>
           ))}
