@@ -1,0 +1,120 @@
+{
+  "theme": "Light",
+  "archetype": "Archetype 1: Organic & Earthy",
+  "brand": {
+    "name": "Gospel Roots Lawn Care",
+    "tagline": "Serving with Faith. Committed to Quality.",
+    "owners": "Lucas & Matthew",
+    "vibe": "Premium, welcoming, professional, subtly Christian-inspired."
+  },
+  "colors": {
+    "primary": "#1B4332",
+    "secondary": "#2D6A4F",
+    "accent": "#8B5A2B",
+    "background_base": "#F9F8F6",
+    "background_surface": "#FFFFFF",
+    "text_main": "#121212",
+    "text_muted": "#4A5568",
+    "border": "#E2E8F0"
+  },
+  "typography": {
+    "heading_font": "Cormorant Garamond",
+    "body_font": "Manrope",
+    "rules": {
+      "h1": "text-5xl md:text-6xl tracking-tight text-[#1B4332] font-semibold",
+      "h2": "text-4xl md:text-5xl tracking-tight text-[#1B4332] font-medium",
+      "h3": "text-2xl md:text-3xl text-[#121212] font-medium",
+      "body": "text-base md:text-lg text-[#4A5568] leading-relaxed",
+      "overline": "uppercase tracking-[0.2em] text-sm text-[#8B5A2B] font-semibold"
+    }
+  },
+  "layout": {
+    "spacing_system": "Generous spacing. py-24 to py-32 for sections. gap-8 to gap-12 for grids.",
+    "grid_strategy": "Bento-style grids for Gallery and Services. Asymmetric layouts for About section.",
+    "radius": "rounded-2xl for soft, organic feel."
+  },
+  "media": {
+    "hero": [
+      {
+        "url": "https://images.pexels.com/photos/16630711/pexels-photo-16630711.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Lush green lawn at sunrise, premium landscaping feel",
+        "category": "hero_background"
+      }
+    ],
+    "about": [
+      {
+        "url": "https://images.pexels.com/photos/5163420/pexels-photo-5163420.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Professional landscaper mowing the lawn",
+        "category": "about_image"
+      }
+    ],
+    "gallery": [
+      {
+        "url": "https://images.pexels.com/photos/17933004/pexels-photo-17933004.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Overgrown yard with wheelbarrow",
+        "category": "before_image_1"
+      },
+      {
+        "url": "https://images.pexels.com/photos/7546775/pexels-photo-7546775.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Perfect manicured backyard with patio",
+        "category": "after_image_1"
+      },
+      {
+        "url": "https://images.pexels.com/photos/32528678/pexels-photo-32528678.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "Overgrown house lawn",
+        "category": "before_image_2"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1681853108586-f29b4ef5c0fb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwyfHxwZXJmZWN0JTIwbWFuaWN1cmVkJTIwbGF3biUyMGJhY2t5YXJkfGVufDB8fHx8MTc4MjA5NTYwNXww&ixlib=rb-4.1.0&q=85",
+        "description": "Grassy yard and fence",
+        "category": "after_image_2"
+      }
+    ],
+    "services_bg": [
+      {
+        "url": "https://images.unsplash.com/photo-1779565145494-bab59ef83256?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHw0fHxiZWF1dGlmdWwlMjBnYXJkZW4lMjBiYWNreWFyZCUyMGxhbmRzY2FwaW5nfGVufDB8fHx8MTc4MjA5NTU5MXww&ixlib=rb-4.1.0&q=85",
+        "description": "Garden pathway",
+        "category": "services_overview"
+      }
+    ]
+  },
+  "icons": {
+    "library": "lucide-react",
+    "mapping": {
+      "Lawn Mowing": "Scissors",
+      "Edging": "Ruler",
+      "Weed Eating": "Sprout",
+      "Leaf Cleanup": "Leaf",
+      "Seasonal Cleanup": "Sun",
+      "Mulching": "Layers",
+      "Hedge Trimming": "Trees",
+      "Pressure Washing": "Droplets",
+      "Faith/Roots": "Cross (custom SVG or subtly represented via tree/root icon)",
+      "Contact": "Phone, Mail, MapPin"
+    }
+  },
+  "sections_strategy": {
+    "navigation": "Sticky header with glassmorphism (backdrop-blur-xl bg-[#F9F8F6]/80). Minimalist logo displaying a cross with roots. Desktop links visible, button CTA.",
+    "hero": "Full height (min-h-[90vh]). Lush background image with bg-black/40 overlay for readability. Center or left-aligned Serif H1 'Professional Lawn Care Rooted in Faith'. Primary green CTA button.",
+    "about": "Asymmetric layout. Text content and founders' story on one side, overlapping a solid green block with the landscaper image on the other.",
+    "services": "Bento-grid styled cards. White background with soft borders. Display service title, short description, and an icon. Hover effect lifts the card (-translate-y-1) and deepens the shadow.",
+    "why_choose_us": "Icon-driven feature list. Earthy Brown icons to ground the section. Text highlights reliability, faith, and quality.",
+    "gallery": "Before/After layout side-by-side or using a slider component. Images have rounded-2xl corners to match organic shapes.",
+    "testimonials": "Clean white cards with light shadow-sm. Use masonry or horizontal scroll layout.",
+    "contact": "2-column layout. Left: Contact info and FAQ accordion. Right: Contact form using customized Shadcn components (Input, Textarea, Button).",
+    "footer": "Dark green background (#1B4332). Earthy brown accents and light text. Generous py-20 padding."
+  },
+  "motion": {
+    "library": "framer-motion, lenis (for smooth scrolling)",
+    "rules": "Fade-in-up animations for text blocks and cards as they scroll into view. Smooth, subtle hover transitions on interactive elements."
+  },
+  "testing": {
+    "attributes": [
+      "data-testid='hero-cta-button'",
+      "data-testid='contact-form'",
+      "data-testid='contact-submit'",
+      "data-testid='service-card'",
+      "data-testid='nav-link'"
+    ]
+  }
+}
