@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Navigate, Link } from "react-router-dom";
 import {
-  LogOut, Mail, Phone, MapPin, Trash2, RefreshCw, Inbox, Calendar, ChevronDown,
+  LogOut, Mail, Phone, MapPin, Trash2, RefreshCw, Inbox, Calendar, ChevronDown, CalendarClock,
 } from "lucide-react";
 import { useAuth, formatApiErrorDetail } from "../context/AuthContext";
 import BrandMark from "../components/BrandMark";
@@ -92,6 +92,25 @@ export default function AdminQuotes() {
     if (filter === "all") return quotes;
     return quotes.filter((q) => (q.status || "new") === filter);
   }, [quotes, filter]);
+
+  // Today's follow-ups: leads where follow_up_at is set and is today OR overdue,
+  // and the status is not 'won' or 'lost' (closed).
+  const followups = useMemo(() => {
+    if (!quotes) return { overdue: [], today: [] };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const overdue = [];
+    const dueToday = [];
+    quotes.forEach((q) => {
+      if (!q.follow_up_at) return;
+      if (q.status === "won" || q.status === "lost") return;
+      const d = new Date(q.follow_up_at + "T00:00:00");
+      if (isNaN(d.getTime())) return;
+      if (d.getTime() < today.getTime()) overdue.push(q);
+      else if (d.getTime() === today.getTime()) dueToday.push(q);
+    });
+    return { overdue, today: dueToday };
+  }, [quotes]);
 
   if (user === null) {
     return (

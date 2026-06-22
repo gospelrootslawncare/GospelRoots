@@ -9,10 +9,10 @@ const NAV = [
   { href: "/#services",     label: "Services" },
   { href: "/plans",         label: "Plans",    route: true },
   { href: "/#team",         label: "Team" },
-  { href: "/#areas",        label: "Areas" },
   { href: "/#gallery",      label: "Gallery" },
   { href: "/blog",          label: "Blog",     route: true },
   { href: "/referrals",     label: "Refer",    route: true },
+  { href: "/#faq",          label: "FAQ" },
   { href: "/#contact",      label: "Contact" },
 ];
 

@@ -5,24 +5,32 @@ import {
 
 const FAQS = [
   {
-    q: "What areas do you serve?",
-    a: "We serve homeowners in our local community. Reach out with your address and we’ll confirm if you’re inside our service zone — we’re happy to drive a little further for the right fit.",
+    q: "What does the $30 All-in-One Yard Care include?",
+    a: "Every visit includes mowing, edging, and weed eating — and we blow off the driveway and walkways before we leave. That’s the whole job, one flat rate.",
   },
   {
-    q: "Do you offer one-time services or only recurring?",
-    a: "Both! We provide weekly and bi-weekly maintenance plans, as well as one-time visits for seasonal cleanups, mulching, and special projects.",
+    q: "Why one flat $30 rate?",
+    a: "Honest, simple pricing is part of how we want to run this business. $30 covers an average residential yard in Gilmer. If your lot is significantly larger, we’ll let you know during the free estimate — no surprise charges after the fact.",
   },
   {
-    q: "How much does service cost?",
-    a: "Pricing depends on the size of your yard, the services needed, and frequency. We provide honest, upfront quotes after a quick look — no hidden fees, ever.",
+    q: "Where do you service?",
+    a: "We currently service Gilmer, TX. If you’re just outside the city limits, reach out — we may still be able to help and we’ll let you know quickly if it’s a good fit.",
+  },
+  {
+    q: "Do you offer weekly or one-time service?",
+    a: "Both. You can pick weekly, bi-weekly, or a one-time visit — same flat rate either way. Most customers go bi-weekly during the growing season and weekly through peak summer.",
+  },
+  {
+    q: "How fast can you give me a quote?",
+    a: "Free estimate within 24 hours — usually much sooner. You’ll hear directly from Lucas or Matthew.",
   },
   {
     q: "Are you insured?",
     a: "Yes. We carry liability coverage and treat every property like it’s our own. If something ever isn’t right, we make it right.",
   },
   {
-    q: "How do I get started?",
-    a: "Fill out the quote form below or give us a call. We’ll respond promptly to schedule a quick visit or phone consultation.",
+    q: "How do I pay?",
+    a: "We’ll go over payment options when we confirm your first visit. We keep it simple and flexible — most customers pay per visit or set up a regular schedule.",
   },
   {
     q: "What does “Rooted in Faith” mean for your business?",

@@ -8,7 +8,6 @@ import Hero from "@/components/Hero";
 import About from "@/components/About";
 import Services from "@/components/Services";
 import WhyChooseUs from "@/components/WhyChooseUs";
-import AreasServed from "@/components/AreasServed";
 import MeetTheTeam from "@/components/MeetTheTeam";
 import Equipment from "@/components/Equipment";
 import Gallery from "@/components/Gallery";
@@ -40,7 +39,6 @@ function HomePage() {
         <WhyChooseUs />
         <MeetTheTeam />
         <Equipment />
-        <AreasServed />
         <Gallery />
         <GoogleReviews />
         <FAQ />
