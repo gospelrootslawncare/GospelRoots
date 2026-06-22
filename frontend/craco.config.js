@@ -61,22 +61,36 @@ let webpackConfig = {
 };
 
 webpackConfig.devServer = (devServerConfig) => {
-  // Add health check endpoints if enabled
-  if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
-    const originalSetupMiddlewares = devServerConfig.setupMiddlewares;
+  // Compatibility shim for webpack-dev-server v5 (react-scripts uses v4 API).
+  // Remove/translate deprecated options that throw in v5.
+  const onBefore = devServerConfig.onBeforeSetupMiddleware;
+  const onAfter = devServerConfig.onAfterSetupMiddleware;
+  delete devServerConfig.onBeforeSetupMiddleware;
+  delete devServerConfig.onAfterSetupMiddleware;
 
-    devServerConfig.setupMiddlewares = (middlewares, devServer) => {
-      // Call original setup if exists
-      if (originalSetupMiddlewares) {
-        middlewares = originalSetupMiddlewares(middlewares, devServer);
-      }
-
-      // Setup health endpoints
-      setupHealthEndpoints(devServer, healthPluginInstance);
-
-      return middlewares;
-    };
+  // `https` -> `server: { type: 'https', options }`
+  if (devServerConfig.https !== undefined) {
+    if (devServerConfig.https && typeof devServerConfig.https === 'object') {
+      devServerConfig.server = { type: 'https', options: devServerConfig.https };
+    } else if (devServerConfig.https) {
+      devServerConfig.server = 'https';
+    }
+    delete devServerConfig.https;
   }
+
+  const existingSetupMiddlewares = devServerConfig.setupMiddlewares;
+  devServerConfig.setupMiddlewares = (middlewares, devServer) => {
+    if (onBefore) onBefore(devServer);
+    if (existingSetupMiddlewares) {
+      middlewares = existingSetupMiddlewares(middlewares, devServer);
+    }
+    if (onAfter) onAfter(devServer);
+
+    if (config.enableHealthCheck && setupHealthEndpoints && healthPluginInstance) {
+      setupHealthEndpoints(devServer, healthPluginInstance);
+    }
+    return middlewares;
+  };
 
   return devServerConfig;
 };
