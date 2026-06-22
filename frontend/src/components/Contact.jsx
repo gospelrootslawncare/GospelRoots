@@ -10,8 +10,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const SERVICES = [
-  "Lawn Mowing", "Edging", "Weed Eating", "Leaf Cleanup",
-  "Seasonal Cleanup", "Mulching", "Hedge Trimming", "Other",
+  "Lawn Mowing", "Edging", "Weed Eating", "Other",
 ];
 
 export default function Contact() {

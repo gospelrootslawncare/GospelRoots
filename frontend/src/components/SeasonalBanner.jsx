@@ -39,7 +39,7 @@ export default function SeasonalBanner() {
         >
           <Sparkles size={14} className="text-[#cbe2d0]" />
           <span>
-            <strong className="font-semibold">Now booking</strong> weekly mowing and fall cleanups in Gilmer, TX — free estimate within 24 hours.
+            <strong className="font-semibold">Now booking</strong> weekly mowing in Gilmer, TX — free estimate within 24 hours.
           </span>
         </a>
         <button

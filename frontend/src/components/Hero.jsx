@@ -43,7 +43,7 @@ export default function Hero() {
             style={{ transitionDelay: "160ms" }}
           >
             Serving homeowners with dependable lawn care, honest work, and quality you can trust.
-            From weekly mowing to seasonal cleanups, we treat every yard with the care and respect it deserves.
+            From weekly mowing to clean edges and tidy trim work, we treat every yard with the care and respect it deserves.
           </p>
 
           <div
