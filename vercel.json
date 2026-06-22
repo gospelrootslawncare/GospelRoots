@@ -6,8 +6,7 @@
     },
     "backend": {
       "root": "backend",
-      "framework": "fastapi",
-      "path": "/_/backend"
+      "framework": "fastapi"
     }
   }
 }
