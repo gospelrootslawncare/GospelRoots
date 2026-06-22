@@ -76,7 +76,7 @@ export default function Hero() {
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#cbe2d0]/20 text-[#cbe2d0]">
               ✓
             </span>
-            Free estimate within <strong className="font-semibold text-white">24 hours</strong> · Gilmer, TX &amp; surrounding areas
+            Free estimate within <strong className="font-semibold text-white">24 hours</strong> · Serving Gilmer, TX
           </div>
 
           {/* Trust badges */}

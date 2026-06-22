@@ -60,7 +60,7 @@ export default function BlogPost() {
               <div className="text-xs uppercase tracking-[0.22em] text-[#cbe2d0] font-semibold">Need help with your yard?</div>
               <div className="font-serif text-3xl mt-2">We’ll take it from here.</div>
               <p className="mt-3 text-white/85 max-w-xl">
-                Free estimate within 24 hours. Honest pricing, dependable service in Gilmer, TX &amp; surrounding areas.
+                Free estimate within 24 hours. Honest pricing, dependable service in Gilmer, TX.
               </p>
               <Link
                 to="/#contact"

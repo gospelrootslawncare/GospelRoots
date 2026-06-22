@@ -93,7 +93,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-[#4A5568]">Service Area</div>
-                  <div className="font-serif text-xl text-brand-primary">Gilmer, TX &amp; surrounding areas</div>
+                  <div className="font-serif text-xl text-brand-primary">Gilmer, TX</div>
                 </div>
               </div>
             </div>
