@@ -5,7 +5,10 @@
       "framework": "create-react-app",
       "buildCommand": "yarn build",
       "outputDirectory": "build",
-      "installCommand": "yarn install"
+      "installCommand": "yarn install",
+      "rewrites": [
+        { "source": "/(.*)", "destination": "/index.html" }
+      ]
     },
     "backend": {
       "root": "backend",

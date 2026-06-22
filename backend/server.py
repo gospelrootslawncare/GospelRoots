@@ -21,8 +21,15 @@ from pydantic import BaseModel, Field, ConfigDict, EmailStr
 
 
 # ===== Setup =====
+# Mongo client tuned for serverless cold starts (e.g. Vercel): small pool,
+# fast server-selection timeout so a cold lambda doesn't hang on slow DNS.
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    maxPoolSize=10,
+    minPoolSize=0,
+    serverSelectionTimeoutMS=5000,
+)
 db = client[os.environ['DB_NAME']]
 
 app = FastAPI(title="Gospel Roots Lawn Care API")
@@ -371,10 +378,15 @@ async def create_quote(payload: QuoteRequestCreate):
         logger.exception("Failed to save quote request")
         raise HTTPException(status_code=500, detail="Could not save quote request") from e
 
-    # Fire-and-forget notifications (do not block the API response)
-    asyncio.create_task(send_quote_notification(obj))
-    asyncio.create_task(send_customer_autoreply(obj))
-    asyncio.create_task(send_quote_sms(obj))
+    # Send notifications before returning so they complete on serverless
+    # (e.g. Vercel) where background tasks die when the response is sent.
+    # Run concurrently to keep latency low; failures never block the response.
+    await asyncio.gather(
+        send_quote_notification(obj),
+        send_customer_autoreply(obj),
+        send_quote_sms(obj),
+        return_exceptions=True,
+    )
     return obj
 
 

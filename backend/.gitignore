@@ -1,0 +1,9 @@
+# Backend-specific gitignore (in addition to root .gitignore)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+.pytest_cache/
+.coverage
