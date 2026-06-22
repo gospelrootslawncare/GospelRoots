@@ -54,7 +54,7 @@ export default function AdminLogin() {
                   id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   data-testid="login-input-email"
                   className="h-11 rounded-xl pl-9" required autoFocus
-                  placeholder="you@gospelrootslawncare.com"
+                  placeholder="you@gmail.com"
                 />
               </div>
             </div>

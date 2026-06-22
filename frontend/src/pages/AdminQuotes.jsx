@@ -210,6 +210,56 @@ export default function AdminQuotes() {
           </button>
         </div>
 
+        {/* Today's follow-ups widget */}
+        {(followups.overdue.length > 0 || followups.today.length > 0) && (
+          <div
+            className="mt-6 rounded-2xl border border-brand-accent/30 bg-[#FFF6E2] p-5 sm:p-6"
+            data-testid="followups-widget"
+          >
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#8a6d1a] font-semibold">
+              <CalendarClock size={14} /> Follow-ups
+              <span className="ml-auto text-[10px] text-[#8a6d1a]/80">
+                {followups.overdue.length + followups.today.length} due
+              </span>
+            </div>
+            <div className="mt-3 grid sm:grid-cols-2 gap-2.5">
+              {followups.overdue.map((q) => (
+                <button
+                  key={q.id}
+                  onClick={() => setSelected(q)}
+                  data-testid={`followup-overdue-${q.id}`}
+                  className="text-left rounded-xl bg-white border border-red-200 px-4 py-3 hover:shadow-sm transition"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-serif text-base text-brand-primary truncate">{q.name}</div>
+                    <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-red-700 whitespace-nowrap">
+                      Overdue · {q.follow_up_at}
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#4A5568] mt-0.5 truncate">{q.phone} · {q.service || "—"}</div>
+                </button>
+              ))}
+              {followups.today.map((q) => (
+                <button
+                  key={q.id}
+                  onClick={() => setSelected(q)}
+                  data-testid={`followup-today-${q.id}`}
+                  className="text-left rounded-xl bg-white border border-brand-accent/30 px-4 py-3 hover:shadow-sm transition"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-serif text-base text-brand-primary truncate">{q.name}</div>
+                    <span className="text-[10px] uppercase tracking-[0.16em] font-bold text-brand-accent whitespace-nowrap">
+                      Today
+                    </span>
+                  </div>
+                  <div className="text-xs text-[#4A5568] mt-0.5 truncate">{q.phone} · {q.service || "—"}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+
         {/* Filter chips */}
         {quotes && quotes.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2" data-testid="admin-filters">
