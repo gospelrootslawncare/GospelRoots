@@ -10,12 +10,32 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const SERVICES = [
-  "Lawn Mowing", "Edging", "Weed Eating", "Other",
+  "All-in-One Yard Care", "Other",
+];
+
+const TIME_WINDOWS = [
+  "Morning (8a – 12p)",
+  "Afternoon (12p – 4p)",
+  "Late afternoon (4p – 7p)",
+  "No preference",
+];
+
+const REFERRAL_SOURCES = [
+  "Google search",
+  "Friend or neighbor",
+  "Facebook",
+  "Drove by a job",
+  "Other",
 ];
 
 export default function Contact() {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", address: "", service: "", message: "",
+    name: "", email: "", phone: "", address: "",
+    service: "All-in-One Yard Care",
+    preferred_date: "",
+    preferred_window: "",
+    referral_source: "",
+    message: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -33,7 +53,12 @@ export default function Contact() {
       await axios.post(`${API}/quotes`, form);
       setSuccess(true);
       toast.success("Quote request sent! We'll be in touch soon.");
-      setForm({ name: "", email: "", phone: "", address: "", service: "", message: "" });
+      setForm({
+        name: "", email: "", phone: "", address: "",
+        service: "All-in-One Yard Care",
+        preferred_date: "", preferred_window: "",
+        referral_source: "", message: "",
+      });
     } catch (err) {
       const detail = err?.response?.data?.detail;
       toast.error(typeof detail === "string" ? detail : "Something went wrong. Please try again.");
@@ -169,9 +194,54 @@ export default function Contact() {
                   data-testid="contact-input-service"
                   className="mt-1.5 w-full h-11 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
                 >
-                  <option value="">Select a service…</option>
                   {SERVICES.map((s) => (
                     <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Scheduling */}
+              <div className="mt-5 grid sm:grid-cols-2 gap-5">
+                <div>
+                  <Label htmlFor="preferred_date" className="text-brand-primary">
+                    Preferred visit date <span className="text-[#9aa3ad] font-normal">(optional)</span>
+                  </Label>
+                  <Input
+                    id="preferred_date" name="preferred_date" type="date" value={form.preferred_date} onChange={onChange}
+                    data-testid="contact-input-date"
+                    min={new Date().toISOString().slice(0, 10)}
+                    className="mt-1.5 h-11 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="preferred_window" className="text-brand-primary">
+                    Time window <span className="text-[#9aa3ad] font-normal">(optional)</span>
+                  </Label>
+                  <select
+                    id="preferred_window" name="preferred_window" value={form.preferred_window} onChange={onChange}
+                    data-testid="contact-input-window"
+                    className="mt-1.5 w-full h-11 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                  >
+                    <option value="">Choose a window…</option>
+                    {TIME_WINDOWS.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <Label htmlFor="referral_source" className="text-brand-primary">
+                  How did you hear about us? <span className="text-[#9aa3ad] font-normal">(optional)</span>
+                </Label>
+                <select
+                  id="referral_source" name="referral_source" value={form.referral_source} onChange={onChange}
+                  data-testid="contact-input-referral"
+                  className="mt-1.5 w-full h-11 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
+                >
+                  <option value="">Select…</option>
+                  {REFERRAL_SOURCES.map((r) => (
+                    <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
               </div>

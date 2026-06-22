@@ -9,8 +9,11 @@ import About from "@/components/About";
 import Services from "@/components/Services";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import AreasServed from "@/components/AreasServed";
+import MeetTheTeam from "@/components/MeetTheTeam";
+import Equipment from "@/components/Equipment";
 import Gallery from "@/components/Gallery";
 import Testimonials from "@/components/Testimonials";
+import GoogleReviews from "@/components/GoogleReviews";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
@@ -22,6 +25,8 @@ import AdminLogin from "@/pages/AdminLogin";
 import AdminQuotes from "@/pages/AdminQuotes";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
+import Plans from "@/pages/Plans";
+import Referrals from "@/pages/Referrals";
 
 function HomePage() {
   useScrollReveal();
@@ -34,9 +39,12 @@ function HomePage() {
         <About />
         <Services />
         <WhyChooseUs />
+        <MeetTheTeam />
+        <Equipment />
         <AreasServed />
         <Gallery />
         <Testimonials />
+        <GoogleReviews />
         <FAQ />
         <Contact />
       </main>
@@ -53,6 +61,8 @@ function App() {
         <AuthProvider>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/plans" element={<Plans />} />
+            <Route path="/referrals" element={<Referrals />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/admin/login" element={<AdminLogin />} />

@@ -7,12 +7,12 @@ import BrandMark from "./BrandMark";
 const NAV = [
   { href: "/#about",        label: "About" },
   { href: "/#services",     label: "Services" },
-  { href: "/#why",          label: "Why Us" },
+  { href: "/plans",         label: "Plans",    route: true },
+  { href: "/#team",         label: "Team" },
   { href: "/#areas",        label: "Areas" },
   { href: "/#gallery",      label: "Gallery" },
-  { href: "/#testimonials", label: "Reviews" },
-  { href: "/blog",          label: "Blog", route: true },
-  { href: "/#faq",          label: "FAQ" },
+  { href: "/blog",          label: "Blog",     route: true },
+  { href: "/referrals",     label: "Refer",    route: true },
   { href: "/#contact",      label: "Contact" },
 ];
 

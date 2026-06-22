@@ -135,6 +135,18 @@ export default function AdminQuotes() {
     }
   };
 
+  const handleFieldSave = async (id, patch, label = "Saved") => {
+    try {
+      const { data } = await api.patch(`/quotes/${id}`, patch);
+      const updated = quotes.map((q) => (q.id === id ? data : q));
+      setQuotes(updated);
+      if (selected?.id === id) setSelected(data);
+      toast.success(label);
+    } catch (err) {
+      toast.error(formatApiErrorDetail(err?.response?.data?.detail) || "Update failed.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-brand-base flex flex-col">
       {/* Top bar */}
@@ -346,6 +358,56 @@ export default function AdminQuotes() {
                     <div className="text-[10px] uppercase tracking-[0.18em] text-[#4A5568]">Message</div>
                     <div className="mt-2 rounded-2xl bg-brand-base border border-black/5 p-4 text-sm text-[#1B4332] whitespace-pre-wrap leading-relaxed">
                       {selected.message}
+                    </div>
+                  </div>
+
+                  {/* Internal notes + follow-up date */}
+                  <div className="mt-6 grid sm:grid-cols-5 gap-4">
+                    <div className="sm:col-span-3">
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#4A5568]">Internal notes</div>
+                      <textarea
+                        key={`notes-${selected.id}`}
+                        defaultValue={selected.notes || ""}
+                        onBlur={(e) => {
+                          const val = e.target.value;
+                          if (val !== (selected.notes || "")) {
+                            handleFieldSave(selected.id, { notes: val }, "Notes saved");
+                          }
+                        }}
+                        data-testid="admin-notes"
+                        rows={4}
+                        placeholder="e.g. Called 6/22 left voicemail. Try again Friday afternoon."
+                        className="mt-1.5 w-full rounded-xl border border-input bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/25"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#4A5568]">Follow up on</div>
+                      <input
+                        key={`fu-${selected.id}`}
+                        type="date"
+                        defaultValue={selected.follow_up_at || ""}
+                        onChange={(e) => {
+                          const val = e.target.value || null;
+                          handleFieldSave(selected.id, { follow_up_at: val ?? "" }, val ? "Follow-up date set" : "Follow-up cleared");
+                        }}
+                        data-testid="admin-follow-up"
+                        className="mt-1.5 w-full h-11 rounded-xl border border-input bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/25"
+                      />
+                      {selected.preferred_date && (
+                        <div className="mt-3 text-[10px] uppercase tracking-[0.18em] text-[#4A5568]">Customer preferred</div>
+                      )}
+                      {selected.preferred_date && (
+                        <div className="text-sm text-brand-primary mt-1">
+                          {selected.preferred_date}
+                          {selected.preferred_window ? ` · ${selected.preferred_window}` : ""}
+                        </div>
+                      )}
+                      {selected.referral_source && (
+                        <>
+                          <div className="mt-3 text-[10px] uppercase tracking-[0.18em] text-[#4A5568]">Heard about us via</div>
+                          <div className="text-sm text-brand-primary mt-1">{selected.referral_source}</div>
+                        </>
+                      )}
                     </div>
                   </div>
 

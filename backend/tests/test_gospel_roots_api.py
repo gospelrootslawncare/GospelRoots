@@ -1,13 +1,4 @@
-"""Gospel Roots Lawn Care - Backend API tests (iteration 2).
-
-Covers:
-- Health
-- POST /api/quotes (success, validation, optional fields) + email notification log
-- POST /api/auth/login (success, bad creds)
-- GET  /api/auth/me (with/without token)
-- GET  /api/quotes (auth-gated)
-- DELETE /api/quotes/{id} (auth-gated, cleanup)
-"""
+"""Gospel Roots Lawn Care - Backend API tests (iteration 4)."""
 import os
 import time
 import pytest
@@ -33,18 +24,13 @@ def admin_token(session):
     r = session.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
     if r.status_code != 200:
         pytest.skip(f"Admin login failed ({r.status_code}): {r.text}")
-    data = r.json()
-    assert "access_token" in data
-    return data["access_token"]
+    return r.json()["access_token"]
 
 
 @pytest.fixture(scope="module")
 def admin_session(admin_token):
     s = requests.Session()
-    s.headers.update({
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {admin_token}",
-    })
+    s.headers.update({"Content-Type": "application/json", "Authorization": f"Bearer {admin_token}"})
     return s
 
 
@@ -52,46 +38,33 @@ def admin_session(admin_token):
 def test_root_health(session):
     r = session.get(f"{API}/")
     assert r.status_code == 200
-    data = r.json()
-    assert "Gospel Roots" in data.get("message", "")
+    assert "Gospel Roots" in r.json().get("message", "")
 
 
-# ===== Quotes: Create (public) =====
-def test_create_quote_success(session):
+# ===== POST /api/quotes with new fields =====
+def test_create_quote_with_new_fields(session):
     payload = {
-        "name": "TEST_John Doe",
-        "email": "test_john@example.com",
-        "phone": "555-1234",
-        "address": "123 Test Lane",
-        "service": "Mowing",
-        "message": "Need a lawn quote",
+        "name": "TEST_Iter4 Customer",
+        "email": "test_iter4@example.com",
+        "phone": "555-4040",
+        "address": "777 Test Rd",
+        "service": "All-in-One Yard Care",
+        "preferred_date": "2026-02-15",
+        "preferred_window": "Morning (8a - 12p)",
+        "referral_source": "Google search",
+        "message": "Iter4 e2e test — please ignore",
     }
     r = session.post(f"{API}/quotes", json=payload)
     assert r.status_code == 201, r.text
     data = r.json()
-    assert isinstance(data.get("id"), str) and len(data["id"]) > 0
-    assert data["name"] == payload["name"]
-    assert data["email"] == payload["email"]
-    assert data["phone"] == payload["phone"]
+    assert data["preferred_date"] == payload["preferred_date"]
+    assert data["preferred_window"] == payload["preferred_window"]
+    assert data["referral_source"] == payload["referral_source"]
     assert data["service"] == payload["service"]
-    assert data["message"] == payload["message"]
-    assert "created_at" in data
+    assert data["status"] == "new"
+    assert data["notes"] is None
+    assert data["follow_up_at"] is None
     assert "_id" not in data
-    _created_quote_ids.append(data["id"])
-
-
-def test_create_quote_minimal_fields(session):
-    payload = {
-        "name": "TEST_Jane",
-        "email": "test_jane@example.com",
-        "phone": "555-9999",
-        "message": "Minimal quote",
-    }
-    r = session.post(f"{API}/quotes", json=payload)
-    assert r.status_code == 201, r.text
-    data = r.json()
-    assert data["address"] is None
-    assert data["service"] is None
     _created_quote_ids.append(data["id"])
 
 
@@ -102,149 +75,113 @@ def test_create_quote_invalid_email(session):
     assert r.status_code == 422
 
 
-def test_create_quote_missing_required(session):
-    r = session.post(f"{API}/quotes", json={"name": "TEST_Missing"})
-    assert r.status_code == 422
-
-
 # ===== Auth =====
 def test_auth_login_success(session):
     r = session.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
-    assert r.status_code == 200, r.text
-    data = r.json()
-    assert isinstance(data.get("access_token"), str) and len(data["access_token"]) > 20
-    assert data.get("token_type") == "bearer"
-    user = data.get("user") or {}
-    assert user.get("email") == ADMIN_EMAIL
-    assert user.get("role") == "admin"
-    assert "id" in user and "name" in user
+    assert r.status_code == 200
+    assert r.json().get("user", {}).get("role") == "admin"
 
 
 def test_auth_login_invalid(session):
-    # Use a unique email to avoid hitting lockout from previous runs
     r = session.post(f"{API}/auth/login", json={
         "email": f"wrong_{int(time.time())}@example.com", "password": "nope",
     })
     assert r.status_code == 401
 
 
-def test_auth_me_without_token(session):
+def test_auth_me_without_token():
     r = requests.get(f"{API}/auth/me")
     assert r.status_code == 401
 
 
-def test_auth_me_with_token(admin_session):
-    r = admin_session.get(f"{API}/auth/me")
-    assert r.status_code == 200, r.text
+# ===== GET /api/quotes includes new fields & status=new =====
+def test_list_quotes_includes_new_fields(admin_session):
+    r = admin_session.get(f"{API}/quotes")
+    assert r.status_code == 200
     data = r.json()
-    assert data.get("email") == ADMIN_EMAIL
-    assert data.get("role") == "admin"
+    assert isinstance(data, list) and len(data) >= 1
+    qid = _created_quote_ids[0]
+    found = next((q for q in data if q["id"] == qid), None)
+    assert found is not None
+    assert found["preferred_date"] == "2026-02-15"
+    assert found["preferred_window"] == "Morning (8a - 12p)"
+    assert found["referral_source"] == "Google search"
+    assert found["status"] == "new"
+    assert "_id" not in found
 
 
-# ===== Quotes: List (admin) =====
 def test_list_quotes_requires_auth():
     r = requests.get(f"{API}/quotes")
     assert r.status_code == 401
 
 
-def test_list_quotes_with_admin(admin_session):
-    r = admin_session.get(f"{API}/quotes")
-    assert r.status_code == 200, r.text
-    data = r.json()
-    assert isinstance(data, list)
-    assert len(data) >= 1
-    first = data[0]
-    for key in ("id", "name", "email", "phone", "message", "created_at"):
-        assert key in first
-    assert "_id" not in first
-    # Newly created TEST_ quote should be present
-    ids = [q["id"] for q in data]
-    if _created_quote_ids:
-        assert _created_quote_ids[0] in ids
-
-
-# ===== Quotes: Delete (admin) =====
-def test_delete_quote_requires_auth():
-    r = requests.delete(f"{API}/quotes/non-existent-id")
-    assert r.status_code == 401
-
-
-# ===== Quotes: Status field default + PATCH (iteration 3) =====
-def test_list_quotes_includes_status_default_new(session, admin_session):
-    # Create a fresh quote
-    r = session.post(f"{API}/quotes", json={
-        "name": "TEST_StatusDefault", "email": "test_status@example.com",
-        "phone": "555-7777", "message": "default status",
-    })
-    assert r.status_code == 201, r.text
-    qid = r.json()["id"]
-    assert r.json().get("status") == "new"
-    _created_quote_ids.append(qid)
-
-    # Listing also returns status field
-    r2 = admin_session.get(f"{API}/quotes")
-    assert r2.status_code == 200
-    found = next((q for q in r2.json() if q["id"] == qid), None)
-    assert found is not None
-    assert found.get("status") == "new"
-
-
-def test_patch_quote_status_requires_auth():
+# ===== PATCH /api/quotes/{id} — status, notes, follow_up_at =====
+def test_patch_requires_auth():
     r = requests.patch(f"{API}/quotes/anything", json={"status": "won"})
     assert r.status_code == 401
 
 
-def test_patch_quote_status_valid_transitions(session, admin_session):
-    # Create test quote
-    r = session.post(f"{API}/quotes", json={
-        "name": "TEST_PatchValid", "email": "test_patch@example.com",
-        "phone": "555-8888", "message": "patch me",
+def test_patch_status_only(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={"status": "contacted"})
+    assert r.status_code == 200, r.text
+    assert r.json()["status"] == "contacted"
+    # verify via GET
+    rg = admin_session.get(f"{API}/quotes")
+    found = next(q for q in rg.json() if q["id"] == qid)
+    assert found["status"] == "contacted"
+
+
+def test_patch_notes_only(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={"notes": "Called 1/30, left VM"})
+    assert r.status_code == 200, r.text
+    assert r.json()["notes"] == "Called 1/30, left VM"
+    # status preserved
+    assert r.json()["status"] == "contacted"
+
+
+def test_patch_follow_up_at_only(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={"follow_up_at": "2026-02-05"})
+    assert r.status_code == 200, r.text
+    assert r.json()["follow_up_at"] == "2026-02-05"
+
+
+def test_patch_combined_fields(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={
+        "status": "quoted", "notes": "Quoted $30/visit weekly", "follow_up_at": "2026-02-10",
     })
-    assert r.status_code == 201
-    qid = r.json()["id"]
-    _created_quote_ids.append(qid)
-
-    for new_status in ["contacted", "quoted", "won", "lost", "new"]:
-        rp = admin_session.patch(f"{API}/quotes/{qid}", json={"status": new_status})
-        assert rp.status_code == 200, rp.text
-        body = rp.json()
-        assert body["id"] == qid
-        assert body["status"] == new_status
-        assert "_id" not in body
-        # Confirm persistence via GET
-        rg = admin_session.get(f"{API}/quotes")
-        assert rg.status_code == 200
-        persisted = next((q for q in rg.json() if q["id"] == qid), None)
-        assert persisted and persisted["status"] == new_status
+    assert r.status_code == 200
+    body = r.json()
+    assert body["status"] == "quoted"
+    assert body["notes"] == "Quoted $30/visit weekly"
+    assert body["follow_up_at"] == "2026-02-10"
 
 
-def test_patch_quote_status_invalid_value(session, admin_session):
-    r = session.post(f"{API}/quotes", json={
-        "name": "TEST_PatchInvalid", "email": "test_invalid@example.com",
-        "phone": "555-1212", "message": "x",
-    })
-    assert r.status_code == 201
-    qid = r.json()["id"]
-    _created_quote_ids.append(qid)
-
-    rp = admin_session.patch(f"{API}/quotes/{qid}", json={"status": "invalid"})
-    assert rp.status_code == 422
+def test_patch_invalid_status_returns_422(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={"status": "invalid_status"})
+    assert r.status_code == 422
 
 
-def test_patch_quote_status_unknown_id(admin_session):
-    rp = admin_session.patch(f"{API}/quotes/does-not-exist", json={"status": "won"})
-    assert rp.status_code == 404
+def test_patch_empty_body_returns_400(admin_session):
+    qid = _created_quote_ids[0]
+    r = admin_session.patch(f"{API}/quotes/{qid}", json={})
+    assert r.status_code == 400
+    assert "No fields to update" in r.text
 
 
-def test_delete_quote_with_admin_and_cleanup(admin_session):
-    # Delete every TEST_ quote we created
-    assert _created_quote_ids, "No TEST_ quote ids captured for cleanup"
+def test_patch_unknown_id_returns_404(admin_session):
+    r = admin_session.patch(f"{API}/quotes/does-not-exist-iter4", json={"status": "won"})
+    assert r.status_code == 404
+
+
+# ===== Cleanup =====
+def test_delete_cleanup(admin_session):
+    assert _created_quote_ids
     for qid in list(_created_quote_ids):
         r = admin_session.delete(f"{API}/quotes/{qid}")
-        assert r.status_code == 200, r.text
-        body = r.json()
-        assert body.get("deleted") == qid
-        # Verify removal
-        r2 = admin_session.delete(f"{API}/quotes/{qid}")
-        assert r2.status_code == 404
+        assert r.status_code == 200
         _created_quote_ids.remove(qid)

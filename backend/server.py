@@ -46,6 +46,19 @@ NOTIFICATION_RECIPIENT_EMAIL = os.environ.get(
     "NOTIFICATION_RECIPIENT_EMAIL", os.environ.get("ADMIN_EMAIL", "")
 )
 
+# Twilio (optional)
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "")
+TWILIO_FROM_NUMBER = os.environ.get("TWILIO_FROM_NUMBER", "")
+TWILIO_NOTIFICATION_TO_NUMBER = os.environ.get("TWILIO_NOTIFICATION_TO_NUMBER", "")
+_twilio_client = None
+if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
+    try:
+        from twilio.rest import Client as _TwilioClient
+        _twilio_client = _TwilioClient(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    except Exception as _e:  # noqa: BLE001
+        logging.getLogger(__name__).warning("Twilio init failed: %s", _e)
+
 
 # ===== Helpers =====
 def jwt_secret() -> str:
@@ -143,6 +156,9 @@ class QuoteRequestCreate(BaseModel):
     phone: str = Field(..., min_length=4, max_length=40)
     address: Optional[str] = Field(default=None, max_length=240)
     service: Optional[str] = Field(default=None, max_length=80)
+    preferred_date: Optional[str] = Field(default=None, max_length=20)   # YYYY-MM-DD
+    preferred_window: Optional[str] = Field(default=None, max_length=40) # e.g. "Morning (8a-12p)"
+    referral_source: Optional[str] = Field(default=None, max_length=120)
     message: str = Field(..., min_length=1, max_length=2000)
 
 
@@ -154,11 +170,23 @@ class QuoteRequest(BaseModel):
     phone: str
     address: Optional[str] = None
     service: Optional[str] = None
+    preferred_date: Optional[str] = None
+    preferred_window: Optional[str] = None
+    referral_source: Optional[str] = None
     message: str
     status: str = "new"  # new | contacted | quoted | won | lost
+    notes: Optional[str] = None
+    follow_up_at: Optional[str] = None  # ISO date YYYY-MM-DD
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class QuoteUpdate(BaseModel):
+    status: Optional[str] = Field(default=None, pattern="^(new|contacted|quoted|won|lost)$")
+    notes: Optional[str] = Field(default=None, max_length=4000)
+    follow_up_at: Optional[str] = Field(default=None, max_length=20)
+
+
+# Kept for backward compat with iter-3 tests
 class QuoteStatusUpdate(BaseModel):
     status: str = Field(..., pattern="^(new|contacted|quoted|won|lost)$")
 
@@ -240,6 +268,74 @@ async def send_quote_notification(q: QuoteRequest) -> None:
         logger.error("Failed to send quote notification email: %s", e)
 
 
+# ===== Customer auto-reply email =====
+def _build_autoreply_html(q: QuoteRequest) -> str:
+    return f"""
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9F8F6;padding:40px 0;font-family:Arial,Helvetica,sans-serif;">
+      <tr><td align="center">
+        <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e6e6e6;">
+          <tr><td style="background:#1B4332;color:#ffffff;padding:28px 30px;">
+            <div style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#cbe2d0;">Gospel Roots Lawn Care</div>
+            <div style="font-size:24px;font-family:Georgia,serif;margin-top:6px;">Thanks, {q.name.split(' ')[0]} — we got your request.</div>
+          </td></tr>
+          <tr><td style="padding:24px 30px;color:#1B4332;font-size:15px;line-height:1.65;">
+            <p style="margin:0 0 12px 0;">We received your quote request and one of us (Lucas or Matthew) will reach out within <strong>24 hours</strong> — usually much sooner.</p>
+            <p style="margin:0 0 12px 0;">If something is urgent, you can call or text us directly at
+              <a href="tel:+19034245931" style="color:#1B4332;font-weight:600;">(903) 424-5931</a>.</p>
+            <p style="margin:12px 0 0 0;color:#4A5568;font-size:13px;">— Serving with faith. Committed to quality.</p>
+          </td></tr>
+          <tr><td style="background:#F9F8F6;padding:18px 30px;color:#4A5568;font-size:12px;text-align:center;">
+            Gospel Roots Lawn Care · Gilmer, TX
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+    """
+
+
+async def send_customer_autoreply(q: QuoteRequest) -> None:
+    if not resend.api_key:
+        return
+    params = {
+        "from": f"Gospel Roots Lawn Care <{SENDER_EMAIL}>",
+        "to": [q.email],
+        "reply_to": [NOTIFICATION_RECIPIENT_EMAIL] if NOTIFICATION_RECIPIENT_EMAIL else None,
+        "subject": "Thanks — we got your Gospel Roots Lawn Care request",
+        "html": _build_autoreply_html(q),
+    }
+    params = {k: v for k, v in params.items() if v is not None}
+    try:
+        await asyncio.to_thread(resend.Emails.send, params)
+        logger.info("Customer auto-reply sent to %s", q.email)
+    except Exception as e:  # noqa: BLE001
+        logger.error("Failed to send customer auto-reply: %s", e)
+
+
+# ===== Twilio SMS notification =====
+async def send_quote_sms(q: QuoteRequest) -> None:
+    if not _twilio_client or not TWILIO_FROM_NUMBER or not TWILIO_NOTIFICATION_TO_NUMBER:
+        logger.info("Twilio not configured; skipping SMS notification.")
+        return
+    preview = (q.message[:120] + "…") if len(q.message) > 120 else q.message
+    body = (
+        f"New Gospel Roots quote\n"
+        f"{q.name} · {q.phone}\n"
+        f"Service: {q.service or 'n/a'}\n"
+        f"{preview}"
+    )
+    try:
+        def _send():
+            return _twilio_client.messages.create(
+                from_=TWILIO_FROM_NUMBER,
+                to=TWILIO_NOTIFICATION_TO_NUMBER,
+                body=body,
+            )
+        msg = await asyncio.to_thread(_send)
+        logger.info("Quote SMS sent: %s", getattr(msg, "sid", "?"))
+    except Exception as e:  # noqa: BLE001
+        logger.error("Failed to send SMS notification: %s", e)
+
+
 # ===== Routes =====
 @api_router.get("/")
 async def root():
@@ -275,8 +371,10 @@ async def create_quote(payload: QuoteRequestCreate):
         logger.exception("Failed to save quote request")
         raise HTTPException(status_code=500, detail="Could not save quote request") from e
 
-    # Fire-and-forget email notification
+    # Fire-and-forget notifications (do not block the API response)
     asyncio.create_task(send_quote_notification(obj))
+    asyncio.create_task(send_customer_autoreply(obj))
+    asyncio.create_task(send_quote_sms(obj))
     return obj
 
 
@@ -298,14 +396,15 @@ async def delete_quote(quote_id: str, _: dict = Depends(require_admin)):
 
 
 @api_router.patch("/quotes/{quote_id}", response_model=QuoteRequest)
-async def update_quote_status(
+async def update_quote(
     quote_id: str,
-    payload: QuoteStatusUpdate,
+    payload: QuoteUpdate,
     _: dict = Depends(require_admin),
 ):
-    res = await db.quote_requests.update_one(
-        {"id": quote_id}, {"$set": {"status": payload.status}}
-    )
+    updates = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not updates:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    res = await db.quote_requests.update_one({"id": quote_id}, {"$set": updates})
     if res.matched_count == 0:
         raise HTTPException(status_code=404, detail="Quote not found")
     doc = await db.quote_requests.find_one({"id": quote_id}, {"_id": 0})

@@ -6,11 +6,11 @@ const LINKS = [
   { href: "/#home", label: "Home" },
   { href: "/#about", label: "About" },
   { href: "/#services", label: "Services" },
-  { href: "/#why", label: "Why Us" },
+  { href: "/plans", label: "Plans" },
+  { href: "/#team", label: "Team" },
   { href: "/#areas", label: "Areas" },
-  { href: "/#gallery", label: "Gallery" },
   { href: "/blog", label: "Blog" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/referrals", label: "Refer" },
 ];
 
 export default function Footer() {

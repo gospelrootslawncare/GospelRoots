@@ -27,6 +27,48 @@
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
         <title>Gospel Roots Lawn Care — Rooted in Faith</title>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "@id": "https://gospelrootslawncare.com/#business",
+          "name": "Gospel Roots Lawn Care",
+          "image": "https://gospelrootslawncare.com/logo.png",
+          "description": "Faith-based lawn care service in Gilmer, TX. Mowing, edging, and weed eating from Lucas & Matthew. Free estimate within 24 hours.",
+          "telephone": "+1-903-424-5931",
+          "email": "gospelrootslawncare@gmail.com",
+          "priceRange": "$30+",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Gilmer",
+            "addressRegion": "TX",
+            "addressCountry": "US"
+          },
+          "areaServed": {
+            "@type": "City",
+            "name": "Gilmer, TX"
+          },
+          "founder": [
+            { "@type": "Person", "name": "Lucas" },
+            { "@type": "Person", "name": "Matthew" }
+          ],
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+              "opens": "08:00",
+              "closes": "18:00"
+            }
+          ],
+          "makesOffer": {
+            "@type": "Offer",
+            "name": "All-in-One Yard Care",
+            "description": "Mowing, edging, and weed eating in one flat-rate visit.",
+            "price": "30.00",
+            "priceCurrency": "USD"
+          }
+        }
+        </script>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
     </head>
