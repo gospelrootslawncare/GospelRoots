@@ -51,6 +51,17 @@ let webpackConfig = {
         ],
       };
 
+      // This is a pure JavaScript project — drop CRA's TypeScript checker
+      // (fork-ts-checker-webpack-plugin) and the ESLint webpack plugin so we
+      // don't pull in an old `schema-utils@2` + `ajv@6` chain that crashes on
+      // Node 20+ ("Cannot read properties of undefined (reading 'date')").
+      if (Array.isArray(webpackConfig.plugins)) {
+        webpackConfig.plugins = webpackConfig.plugins.filter((plugin) => {
+          const name = plugin && plugin.constructor && plugin.constructor.name;
+          return name !== 'ForkTsCheckerWebpackPlugin' && name !== 'ESLintWebpackPlugin';
+        });
+      }
+
       // Add health check plugin to webpack if enabled
       if (config.enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);
